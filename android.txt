@@ -1,0 +1,3 @@
+title=Minesweeper
+author=Serhii
+orientation=portrait
