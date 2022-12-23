@@ -29,6 +29,37 @@ class MineField:
     def get(self, row, col):
         return self.__field[row][col]
 
+    def zero_clusters(self):
+        zeros = [(i, j) for i in range(self.rows) for j in range(self.cols)
+                 if self.__field[i][j] == 0]
+        zdict = {k: v for v, k in enumerate(zeros)}
+        sets = []
+        for i in range(len(zeros)):
+            cr, cc = zeros[i]
+            sets.append({zeros[i]})
+            for j in zeros[i+1:]:
+                if abs(cr-j[0]) < 2 and abs(cc-j[1]) < 2:
+                    sets[-1].add(j)
+        i = 0
+        while i < len(sets):
+            while True:
+                s = sets[i]
+                prev = len(s)
+                for j in range(len(sets)-1, i, -1):
+                    if not s.isdisjoint(sets[j]):
+                        s.update(sets.pop(j))
+                if prev == len(s):
+                    break
+            i += 1
+        return dict(enumerate(sets))
+
+    def max_zeros(self):
+        clusts = self.zero_clusters()
+        if not clusts:
+            return []
+        by_len = {len(v): k for k, v in clusts.items()}
+        return clusts[by_len[max(by_len.keys())]]
+
 
 class Opener:
     def __init__(self, field):
