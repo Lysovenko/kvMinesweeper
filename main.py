@@ -50,10 +50,7 @@ class FieldWidget(GridLayout):
                 pass
 
     def clust0(self, dummy):
-        print(self.__mined.zero_clusters())
         zeros = self.__mined.max_zeros()
-        print(zeros)
-        print(dummy)
         self.change_btns([v + (0,) for v in zeros])
 
 
