@@ -3,7 +3,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.properties import ListProperty
+from kivy.graphics import Color, Rectangle
 from minefield import MineField, Opener
 
 
@@ -99,6 +99,7 @@ class CellBtn(Button):
         self.__parent = parent
         self.__inactive = False
         super().__init__(**kwargs)
+        self.__bg = self.background_color
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
@@ -128,17 +129,28 @@ class CellBtn(Button):
         self.__inactive = True
         self.text = "[color=%s][b]%d[/b][/color]" % (
             self.__colors.get(digit, "000000"), digit)
+        self.background_color = (1, 1, 1, .8)
+        self.canvas.before.clear()
+        with self.canvas.before:
+            Color(1, 1, .9, .9)
+            Rectangle(size=self.size, pos=self.pos)
 
     def on_size(self, btn, sz):
         self.font_size = min(sz)
+        if self.__inactive:
+            self.canvas.before.clear()
+            with self.canvas.before:
+                Color(1, 1, .9, .9)
+                Rectangle(size=self.size, pos=self.pos)
 
     def reset(self):
         self.text = ""
         self.__inactive = False
+        self.canvas.before.clear()
+        self.background_color = self.__bg
 
 
 class MinesweeperApp(App):
-
     def build(self):
         return RootWidget()
 
