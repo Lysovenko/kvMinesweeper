@@ -20,26 +20,26 @@ class RootWidget(BoxLayout):
         reset.bind(on_press=fw.reset)
         child.add_widget(clust0)
         child.add_widget(reset)
-        child.add_widget(Button(text="baton 3"))
+        switch_mode = Button(text="Open")
+        switch_mode.bind(on_press=fw.switch_mode)
+        child.add_widget(switch_mode)
         self.add_widget(child)
         self.add_widget(fw)
 
 
 class FieldWidget(GridLayout):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.cols = 10
         self.rows = 10
+        self.__open_mode = True
         self.__mined = MineField()
-        minefield = Opener(self.__mined)
+        self.minefield = Opener(self.__mined)
         self.btns = []
         for i in range(100):
-            btn = FieldBtn(text="")
+            btn = FieldBtn(self, text="")
             btn.btn_r = i // 10
             btn.btn_c = i % 10
-            btn.app_mf = minefield
-            btn.change_neibs = self.change_btns
             self.add_widget(btn)
             self.btns.append(btn)
 
@@ -55,28 +55,44 @@ class FieldWidget(GridLayout):
         zeros = list(self.__mined.max_zeros())
         if zeros:
             self.btns[zeros[0][0] * self.cols + zeros[0][1]].pick()
-        
+
     def reset(self, _btn):
         self.__mined = MineField()
-        minefield = Opener(self.__mined)
+        self.minefield = Opener(self.__mined)
         for b in self.btns:
             b.text = ""
-            b.app_mf = minefield
+
+    def switch_mode(self, btn):
+        self.__open_mode = not self.__open_mode
+        btn.text = "Open" if self.__open_mode else "Mark"
+
+    @property
+    def open_mode(self):
+        return self.__open_mode
 
 
 class FieldBtn(Button):
+    def __init__(self, parent, **kwargs):
+        self.__parent = parent
+        super().__init__(**kwargs)
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
-            self.pick()
+            if self.__parent.open_mode:
+                self.pick()
+            else:
+                self.mark()
         return super().on_touch_down(touch)
 
     def pick(self):
-        v = self.app_mf.pick(self.btn_r, self.btn_c)
+        v = self.__parent.minefield.pick(self.btn_r, self.btn_c)
         self.text = "Boom!" if v is None else str(v)
         if v == 0:
-            neibs = self.app_mf.around_zeros()
-            self.change_neibs(neibs)
+            neibs = self.__parent.minefield.around_zeros()
+            self.__parent.change_btns(neibs)
+
+    def mark(self):
+        self.text = "M"
 
 
 class MinesweeperApp(App):
