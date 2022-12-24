@@ -54,7 +54,7 @@ class FieldWidget(GridLayout):
         self.__mined = MineField(*self.__profile)
         self.minefield = Opener(self.__mined)
         for b in self.btns:
-            b.text = ""
+            b.reset()
 
     def switch_mode(self, btn):
         self.__open_mode = not self.__open_mode
@@ -97,10 +97,13 @@ class CellBtn(Button):
         kwargs.update({"text": "", "valign": "middle", "halign": "center",
                        "markup": True})
         self.__parent = parent
+        self.__inactive = False
         super().__init__(**kwargs)
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
+            if self.__inactive:
+                return
             if self.__parent.open_mode:
                 self.pick()
             else:
@@ -122,12 +125,16 @@ class CellBtn(Button):
             self.text = "M"
 
     def set_digit(self, digit):
-        self.markup = True
+        self.__inactive = True
         self.text = "[color=%s][b]%d[/b][/color]" % (
             self.__colors.get(digit, "000000"), digit)
 
     def on_size(self, btn, sz):
         self.font_size = min(sz)
+
+    def reset(self):
+        self.text = ""
+        self.__inactive = False
 
 
 class MinesweeperApp(App):
