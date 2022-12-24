@@ -78,8 +78,8 @@ class FieldWidget(GridLayout):
         self.btns = []
         self.clear_widgets()
         rows, cols, m = profile
-        self.cols = rows
-        self.rows = cols
+        self.cols = cols
+        self.rows = rows
         for i in range(rows * cols):
             btn = FieldBtn(self, text="")
             btn.btn_r = i // cols
@@ -103,7 +103,7 @@ class FieldBtn(Button):
 
     def pick(self):
         v = self.__parent.minefield.pick(self.btn_r, self.btn_c)
-        self.text = "Boom!" if v is None else str(v)
+        self.text = "*" if v is None else str(v)
         if v == 0:
             neibs = self.__parent.minefield.around_zeros()
             self.__parent.change_btns(neibs)
