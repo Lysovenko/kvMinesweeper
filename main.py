@@ -41,7 +41,7 @@ class FieldWidget(GridLayout):
         for r, c, v in btns:
             p = r * self.cols + c
             try:
-                self.btns[p].text = str(v)
+                self.btns[p].set_digit(v)
             except IndexError:
                 pass
 
@@ -89,6 +89,10 @@ class FieldWidget(GridLayout):
 
 
 class FieldBtn(Button):
+    __colors = {0: "ADFF2F", 1: "0000FF", 2: "EE82EE",
+                3: "FF0000", 4: "FF00FF", 5: "00FF00",
+                6: "1E90FF", 7: "00FFFF", 8: "DC143C"}
+
     def __init__(self, parent, **kwargs):
         self.__parent = parent
         super().__init__(**kwargs)
@@ -103,7 +107,10 @@ class FieldBtn(Button):
 
     def pick(self):
         v = self.__parent.minefield.pick(self.btn_r, self.btn_c)
-        self.text = "*" if v is None else str(v)
+        if v is None:
+            self.text = "*"
+        else:
+            self.set_digit(v)
         if v == 0:
             neibs = self.__parent.minefield.around_zeros()
             self.__parent.change_btns(neibs)
@@ -111,6 +118,11 @@ class FieldBtn(Button):
     def mark(self):
         if self.__parent.minefield.user_mark(self.btn_r, self.btn_c):
             self.text = "M"
+
+    def set_digit(self, digit):
+        self.markup = True
+        self.text = "[color=%s][b]%d[/b][/color]" % (
+            self.__colors.get(digit, "000000"), digit)
 
 
 class MinesweeperApp(App):
