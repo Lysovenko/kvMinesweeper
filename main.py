@@ -16,8 +16,10 @@ class RootWidget(BoxLayout):
         fw = FieldWidget()
         clust0 = Button(text="Zero cluster")
         clust0.bind(on_press=fw.clust0)
+        reset = Button(text="Reset")
+        reset.bind(on_press=fw.reset)
         child.add_widget(clust0)
-        child.add_widget(Button(text="baton 2"))
+        child.add_widget(reset)
         child.add_widget(Button(text="baton 3"))
         self.add_widget(child)
         self.add_widget(fw)
@@ -50,21 +52,31 @@ class FieldWidget(GridLayout):
                 pass
 
     def clust0(self, dummy):
-        zeros = self.__mined.max_zeros()
-        self.change_btns([v + (0,) for v in zeros])
+        zeros = list(self.__mined.max_zeros())
+        if zeros:
+            self.btns[zeros[0][0] * self.cols + zeros[0][1]].pick()
+        
+    def reset(self, _btn):
+        self.__mined = MineField()
+        minefield = Opener(self.__mined)
+        for b in self.btns:
+            b.text = ""
+            b.app_mf = minefield
 
 
 class FieldBtn(Button):
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
-            self.pressed = touch.pos
-            v = self.app_mf.pick(self.btn_r, self.btn_c)
-            self.text = "Boom!" if v is None else str(v)
-            if v == 0:
-                neibs = self.app_mf.around_zeros()
-                self.change_neibs(neibs)
+            self.pick()
         return super().on_touch_down(touch)
+
+    def pick(self):
+        v = self.app_mf.pick(self.btn_r, self.btn_c)
+        self.text = "Boom!" if v is None else str(v)
+        if v == 0:
+            neibs = self.app_mf.around_zeros()
+            self.change_neibs(neibs)
 
 
 class MinesweeperApp(App):

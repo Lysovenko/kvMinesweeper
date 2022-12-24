@@ -20,8 +20,12 @@ class MineField:
                 for nr in (-1, 0, 1):
                     for nc in (-1, 0, 1):
                         if any((nr != 0, nc != 0)):
+                            nr_ = r + nr
+                            nc_ = c + nc
+                            if nr_ < 0 or nc_ < 0:
+                                continue
                             try:
-                                if self.__field[r + nr][c + nc] is None:
+                                if self.__field[nr_][nc_] is None:
                                     self.__field[r][c] += 1
                             except IndexError:
                                 continue
