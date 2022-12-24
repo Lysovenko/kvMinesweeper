@@ -23,6 +23,10 @@ class RootWidget(BoxLayout):
         switch_mode = Button(text="Open")
         switch_mode.bind(on_press=fw.switch_mode)
         child.add_widget(switch_mode)
+        for name in ("Beginner", "Intermediate", "Expert"):
+            modifier = Button(text=name)
+            modifier.bind(on_press=fw.change_profile)
+            child.add_widget(modifier)
         self.add_widget(child)
         self.add_widget(fw)
 
@@ -30,18 +34,8 @@ class RootWidget(BoxLayout):
 class FieldWidget(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.cols = 10
-        self.rows = 10
         self.__open_mode = True
-        self.__mined = MineField()
-        self.minefield = Opener(self.__mined)
-        self.btns = []
-        for i in range(100):
-            btn = FieldBtn(self, text="")
-            btn.btn_r = i // 10
-            btn.btn_c = i % 10
-            self.add_widget(btn)
-            self.btns.append(btn)
+        self._change_profile("Beginner")
 
     def change_btns(self, btns):
         for r, c, v in btns:
@@ -57,7 +51,7 @@ class FieldWidget(GridLayout):
             self.btns[zeros[0][0] * self.cols + zeros[0][1]].pick()
 
     def reset(self, _btn):
-        self.__mined = MineField()
+        self.__mined = MineField(*self.__profile)
         self.minefield = Opener(self.__mined)
         for b in self.btns:
             b.text = ""
@@ -69,6 +63,29 @@ class FieldWidget(GridLayout):
     @property
     def open_mode(self):
         return self.__open_mode
+
+    def change_profile(self, btn):
+        self._change_profile(btn.text)
+
+    def _change_profile(self, text):
+        profiles = {"Beginner": (10, 10, 10),
+                    "Intermediate": (16, 16, 40),
+                    "Expert": (16, 30, 99)}
+        profile = profiles.get(text, (10, 10, 10))
+        self.__profile = profile
+        self.__mined = MineField(*profile)
+        self.minefield = Opener(self.__mined)
+        self.btns = []
+        self.clear_widgets()
+        rows, cols, m = profile
+        self.cols = rows
+        self.rows = cols
+        for i in range(rows * cols):
+            btn = FieldBtn(self, text="")
+            btn.btn_r = i // cols
+            btn.btn_c = i % cols
+            self.add_widget(btn)
+            self.btns.append(btn)
 
 
 class FieldBtn(Button):
