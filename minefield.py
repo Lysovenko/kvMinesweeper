@@ -81,6 +81,12 @@ class Opener:
             self.__opened[row][col] = v
         return v
 
+    def user_mark(self, row, col):
+        if self.__opened[row][col] is None:
+            self.__opened[row][col] = "U"
+            return True
+        return False
+
     def _around_zeros(self):
         neibours = []
         for r in range(self.rows):

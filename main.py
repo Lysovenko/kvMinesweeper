@@ -109,7 +109,8 @@ class FieldBtn(Button):
             self.__parent.change_btns(neibs)
 
     def mark(self):
-        self.text = "M"
+        if self.__parent.minefield.user_mark(self.btn_r, self.btn_c):
+            self.text = "M"
 
 
 class MinesweeperApp(App):
