@@ -81,19 +81,21 @@ class FieldWidget(GridLayout):
         self.cols = cols
         self.rows = rows
         for i in range(rows * cols):
-            btn = FieldBtn(self, text="")
+            btn = CellBtn(self)
             btn.btn_r = i // cols
             btn.btn_c = i % cols
             self.add_widget(btn)
             self.btns.append(btn)
 
 
-class FieldBtn(Button):
+class CellBtn(Button):
     __colors = {0: "ADFF2F", 1: "0000FF", 2: "EE82EE",
                 3: "FF0000", 4: "FF00FF", 5: "00FF00",
                 6: "1E90FF", 7: "00FFFF", 8: "DC143C"}
 
     def __init__(self, parent, **kwargs):
+        kwargs.update({"text": "", "valign": "middle", "halign": "center",
+                       "markup": True})
         self.__parent = parent
         super().__init__(**kwargs)
 
@@ -123,6 +125,9 @@ class FieldBtn(Button):
         self.markup = True
         self.text = "[color=%s][b]%d[/b][/color]" % (
             self.__colors.get(digit, "000000"), digit)
+
+    def on_size(self, btn, sz):
+        self.font_size = min(sz)
 
 
 class MinesweeperApp(App):
