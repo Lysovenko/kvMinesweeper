@@ -88,10 +88,18 @@ class FieldWidget(GridLayout):
             self.add_widget(btn)
             self.btns.append(btn)
 
+    def cards_on_the_table(self):
+        for r, c, player, game in self.minefield.comparison():
+            p = r * self.cols + c
+            try:
+                self.btns[p].compare(player, game)
+            except IndexError:
+                pass
+
 
 class CellBtn(Button):
     __colors = {0: "ADFF2F", 1: "0000FF", 2: "EE82EE",
-                3: "FF0000", 4: "FF00FF", 5: "00FF00",
+                3: "FF0000", 4: "FF00FF", 5: "FF6600",
                 6: "1E90FF", 7: "00FFFF", 8: "DC143C"}
 
     def __init__(self, parent, **kwargs):
@@ -115,18 +123,22 @@ class CellBtn(Button):
     def pick(self):
         v = self.__parent.minefield.pick(self.btn_r, self.btn_c)
         if v is None:
-            self.text = "*"
+            self._game_over("Loss", "You lost!")
         else:
             self.set_digit(v)
         if v == 0:
             neibs = self.__parent.minefield.around_zeros()
             self.__parent.change_btns(neibs)
         if self.__parent.minefield.is_clear():
-            b = Button(text="You win!!!")
-            p = Popup(title="Congratulations", content=b, size_hint=(.5, .5))
-            b.bind(on_press=p.dismiss)
-            b.font_size = max(b.size)
-            p.open()
+            self._game_over("Congratulations", "You won!!!")
+
+    def _game_over(self, title, message):
+        b = Button(text=message)
+        p = Popup(title=title, content=b, size_hint=(.5, .5))
+        b.bind(on_press=p.dismiss)
+        b.font_size = b.font_size * 3
+        p.open()
+        self.__parent.cards_on_the_table()
 
     def mark(self):
         if self.__parent.minefield.user_mark(self.btn_r, self.btn_c):
@@ -141,6 +153,17 @@ class CellBtn(Button):
         with self.canvas.before:
             Color(1, 1, .9, .9)
             Rectangle(size=self.size, pos=self.pos)
+
+    def compare(self, player, game):
+        self.__inactive = True
+        if game is None:
+            self.text = "*"
+            if player == "B":
+                self.background_color = (1, 0, 0, 1)
+        elif isinstance(game, int):
+            self.set_digit(game)
+            if player is not None:
+                self.background_color = (1, 0.5, 0.5, 1)
 
     def on_size(self, btn, sz):
         self.font_size = min(sz)

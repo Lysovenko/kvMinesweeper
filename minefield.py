@@ -126,3 +126,9 @@ class Opener:
 
     def is_clear(self):
         return self.__open == self.free
+
+    def comparison(self):
+        return sum(([(r, i, v, self.__mined.get(r, i))
+                     for i, v in enumerate(self.__opened[r])
+                     if not isinstance(v, int)]
+                    for r in range(self.rows)), [])
