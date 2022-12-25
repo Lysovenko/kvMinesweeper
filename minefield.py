@@ -9,6 +9,7 @@ class MineField:
         self.__field = [[0 for j in range(cols)] for i in range(rows)]
         self.rows = rows
         self.cols = cols
+        self.free = rows * cols - mines
         for i in rinds:
             row = i // cols
             col = i % cols
@@ -70,6 +71,8 @@ class Opener:
         self.__mined = field
         self.rows = field.rows
         self.cols = field.cols
+        self.free = field.free
+        self.__open = 0
         self.__opened = [[None for j in range(self.cols)]
                          for i in range(self.rows)]
 
@@ -79,6 +82,7 @@ class Opener:
             self.__opened[row][col] = "B"
         else:
             self.__opened[row][col] = v
+            self.__open += 1
         return v
 
     def user_mark(self, row, col):
@@ -116,4 +120,9 @@ class Opener:
             if not neibs:
                 break
             neibours.extend(neibs)
+        self.__open = sum(sum(1 for i in row if isinstance(i, int))
+                          for row in self.__opened)
         return neibours
+
+    def is_clear(self):
+        return self.__open == self.free

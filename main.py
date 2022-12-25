@@ -3,6 +3,7 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 from kivy.graphics import Color, Rectangle
 from minefield import MineField, Opener
 
@@ -120,6 +121,12 @@ class CellBtn(Button):
         if v == 0:
             neibs = self.__parent.minefield.around_zeros()
             self.__parent.change_btns(neibs)
+        if self.__parent.minefield.is_clear():
+            b = Button(text="You win!!!")
+            p = Popup(title="Congratulations", content=b, size_hint=(.5, .5))
+            b.bind(on_press=p.dismiss)
+            b.font_size = max(b.size)
+            p.open()
 
     def mark(self):
         if self.__parent.minefield.user_mark(self.btn_r, self.btn_c):
