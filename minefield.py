@@ -89,7 +89,9 @@ class Opener:
         if self.__opened[row][col] is None:
             self.__opened[row][col] = "U"
             return True
-        return False
+        elif self.__opened[row][col] == "U":
+            self.__opened[row][col] = None
+            return False
 
     def _around_zeros(self):
         neibours = []

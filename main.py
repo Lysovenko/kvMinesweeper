@@ -143,6 +143,8 @@ class CellBtn(Button):
     def mark(self):
         if self.__parent.minefield.user_mark(self.btn_r, self.btn_c):
             self.text = "M"
+        else:
+            self.text = ""
 
     def set_digit(self, digit):
         self.__inactive = True
